@@ -14,8 +14,8 @@ import math
 
 import utils
 from config import get_parser
-from models.resnet import ResnetEncoder
-from torchvision.models import resnext50_32x4d, resnet50
+from models.resnet import ResNet34, ResNet50
+from torchvision.models import resnext50_32x4d
 from data.dataset_cifar import get_cifar100, get_cifar10
 from data.dataset_LT import get_iNaturaList, get_ImageNetLT
 
@@ -130,9 +130,9 @@ def train_model(dataloaders, model, pseudo_teacher, lossFunc, loss_SelfKD, optim
     testing_batch_generator = get_testing_batch()
     num_testing_steps = len(dataloaders['test'])
     if len(cfg.gpu) ==1:
-        L2_norm = utils.Normalizer(cfg.fc_norm)
+        L2_norm = utils.Normalizer()
     else:
-        L2_norm = utils.Normalizer_multi_GPU(cfg.fc_norm)
+        L2_norm = utils.Normalizer_multi_GPU()
     pseudo_teacher.eval()
 
     med_tail_classes = cal_med_tail_classes(labelList)
@@ -192,8 +192,9 @@ def train_model(dataloaders, model, pseudo_teacher, lossFunc, loss_SelfKD, optim
             output_mix = model(_input_mix)
 
             # Calculate two loss functions
-            error = cfg.alpha * mixup_criterion(lossFunc, output_mix, target_a, target_b, lam).mean() + \
-                    cfg.beta * (loss_SelfKD(output_mix, targets_teacher) * mask).mean()
+            error = mixup_criterion(lossFunc, output_mix, target_a, target_b, lam).mean() + \
+                    cfg.alpha * (loss_SelfKD(output_mix, targets_teacher) * mask).mean()
+
             # Calculate accuracy
             softmaxScores = logits.softmax(dim=1)
             predLabel = softmaxScores.argmax(dim=1).detach().squeeze().type(torch.float)
@@ -315,6 +316,7 @@ def main(cfg):
     torch.manual_seed(0)
     np.random.seed(0)
 
+
     assert cfg.dataset in ['cifar10', 'cifar100', 'imagenet', 'inaturalist']
 
     if cfg.dataset == 'cifar10':
@@ -341,14 +343,14 @@ def main(cfg):
 
     # Build model
     if cfg.dataset == 'cifar100' or cfg.dataset == 'cifar10':
-        model = ResnetEncoder(embDimension=cfg.nClasses)
-        pseudo_teacher = ResnetEncoder(embDimension=cfg.nClasses)
+        model = ResNet34(cfg.nClasses)
+        pseudo_teacher = ResNet34(cfg.nClasses)
     elif cfg.dataset == 'imagenet':
         model = resnext50_32x4d(pretrained=False)
         pseudo_teacher = resnext50_32x4d(pretrained=False)
     else:
-        model = resnet50(pretrained=False)
-        pseudo_teacher = resnet50(pretrained=False)
+        model = ResNet50(cfg.nClasses)
+        pseudo_teacher = ResNet50(cfg.nClasses)
 
     if len(cfg.gpu) > 1:
         print('Training with multi GPU')
@@ -364,6 +366,7 @@ def main(cfg):
     loss_CrossEntropy = nn.CrossEntropyLoss(reduction='none').to(device)
     loss_SelfKD = nn.CrossEntropyLoss(reduction='none').to(device)
 
+    # project_name = 'Mixup_and_selfKD_L2_each_epoch'
     if cfg.dataset == 'cifar100' or cfg.dataset == 'cifar10':
         project_name = 'LCSL_' + cfg.dataset + '_IF_' + str(int(1 / cfg.imb_factor)) + '_data_aug_' + cfg.data_aug + '_network_' + cfg.network
     else:
@@ -416,7 +419,6 @@ def main(cfg):
     if cfg.dataset == 'cifar100' or cfg.dataset == 'cifar10':
         utils.plot_per_class_accuracy(models, dataloaders, labelnames, img_num_per_cls, nClasses=cfg.nClasses, device=device,
                                   save_path=save_dir, figname='visual_{}_l2.png'.format(project_name))
-
 if __name__ == '__main__':
     cfg = get_parser()
     main(cfg)
