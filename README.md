@@ -52,7 +52,7 @@ In which,
 All datasets should be saved in the folder `"datasets"` 
 
 ## Citation
-Coming soon.
+
 ~~~
 @article{vu2024lcsl,
   title={LCSL: Long-tailed Classification via Self-labeling},
