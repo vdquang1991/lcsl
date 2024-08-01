@@ -8,12 +8,15 @@ import numpy as np
 from torch.utils.data import DataLoader, Dataset
 from data.randaugment import rand_augment_transform
 
+
+
 def get_data(csv_file):
     """Load our data from file."""
     with open(csv_file, 'r') as fin:
         reader = csv.reader(fin)
         data = list(reader)
     return data
+    
 
 class GaussianBlur(object):
     """Gaussian blur augmentation in SimCLR https://arxiv.org/abs/2002.05709"""

@@ -32,6 +32,7 @@ class Cutout(object):
 
         return img
 
+
 class ImageNetPolicy(object):
     """ Randomly choose one of the best 24 Sub-policies on ImageNet.
         Example:
