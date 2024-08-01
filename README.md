@@ -50,3 +50,16 @@ In which,
 `--lambda_init=0.5` is the hyperparameter `conf`
 
 All datasets should be saved in the folder `"datasets"` 
+
+## Citation
+Coming soon.
+~~~
+@article{vu2024lcsl,
+  title={LCSL: Long-tailed Classification via Self-labeling},
+  author={Vu, Duc-Quang and Phung, Trang TT and Wang, Jia-Ching and Mai, Son T},
+  journal={IEEE Transactions on Circuits and Systems for Video Technology},
+  year={2024},
+  publisher={IEEE}
+}
+~~~
+
