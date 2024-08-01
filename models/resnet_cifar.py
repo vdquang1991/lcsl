@@ -206,3 +206,6 @@ if __name__ == "__main__":
             print(net_name)
             test(globals()[net_name]())
             print()
+
+
+
