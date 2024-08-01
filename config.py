@@ -2,7 +2,7 @@ import argparse
 
 def get_parser():
     parser = argparse.ArgumentParser(description='Training LCSL approach')
-    parser.add_argument('--image_size', type=int, default=32, help='the height / width of the input image to network')
+    parser.add_argument('--image_size', type=int, default=32, help='32 for cifar and 224 for imagenet and inaturalist')
     parser.add_argument('--dataset', choices=['cifar10', 'cifar100', 'imagenet', 'inaturalist'], default='cifar100', help='dataset to train')
     parser.add_argument('--batch_size', default=64, type=int, help='batch size')
     parser.add_argument('--optimizer', default='sgd', help='optimizer to train with')

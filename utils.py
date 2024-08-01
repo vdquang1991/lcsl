@@ -8,6 +8,8 @@ import torch.nn.functional as F
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 
+
+
 def clear_progressbar():
     # moves up 3 lines
     print("\033[2A")
@@ -15,6 +17,7 @@ def clear_progressbar():
     print("\033[2K")
     # moves up two lines again
     print("\033[2A")
+    
 
 def createMontage(imList, dims, times2rot90=0):
     '''
@@ -39,12 +42,14 @@ def createMontage(imList, dims, times2rot90=0):
             x += 1
     return imMontage
 
+
 def horizontal_flip_aug(model):
     def aug_model(data):
         logits = model(data)
         h_logits = model(data.flip(3))
         return (logits+h_logits)/2
     return aug_model
+
 
 def print_accuracy(model, dataloaders, new_labelList, device='cpu', test_aug=True):
     model.eval()
